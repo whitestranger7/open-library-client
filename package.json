@@ -12,7 +12,10 @@
     "dev": "tsc --watch",
     "example": "ts-node examples/basic-usage.ts",
     "example:js": "npm run build && node examples/basic-usage.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linting configured\" && exit 0",
+    "prepack": "npm run build"
   },
   "keywords": [
     "openlibrary",
@@ -23,24 +26,24 @@
     "javascript",
     "library"
   ],
-  "author": "",
+  "author": "Ivan Vezhnavets <whitestranger7@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.6.0"
+    "axios": "1.10.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0"
+    "@types/node": "24.0.1",
+    "typescript": "5.8.3",
+    "ts-node": "10.9.2"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/username/open-library-client.git"
+    "url": "git+https://github.com/whitestranger7/open-library-client.git"
   },
   "bugs": {
-    "url": "https://github.com/username/open-library-client/issues"
+    "url": "https://github.com/whitestranger7/open-library-client/issues"
   },
-  "homepage": "https://github.com/username/open-library-client#readme",
+  "homepage": "https://github.com/whitestranger7/open-library-client#readme",
   "engines": {
     "node": ">=16.0.0"
   }
