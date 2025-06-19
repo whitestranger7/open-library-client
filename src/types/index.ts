@@ -21,6 +21,19 @@ export interface OpenLibraryClientConfig {
 }
 
 /**
+ * Year range for filtering books
+ */
+export interface YearRange {
+  start: number;
+  end: number;
+}
+
+/**
+ * Sort options for search results
+ */
+export type SortOption = 'random' | 'new' | 'old' | 'rating' | 'title' | 'relevance';
+
+/**
  * Search parameters for book search
  */
 export interface BookSearchParams {
@@ -45,9 +58,27 @@ export interface BookSearchParams {
   isbn?: string;
   
   /**
-   * Search by subject
+   * Search by subject/genre
    */
   subject?: string;
+  
+  /**
+   * Filter by first publish year (single year or range)
+   * @example 1990 or { start: 1990, end: 2000 }
+   */
+  first_publish_year?: number | YearRange;
+  
+  /**
+   * Filter by any publish year (single year or range)
+   * @example 2000 or { start: 2000, end: 2010 }
+   */
+  publish_year?: number | YearRange;
+  
+  /**
+   * Sort results by various criteria
+   * @default 'relevance'
+   */
+  sort?: SortOption;
   
   /**
    * Number of results to return (max 100)
@@ -67,7 +98,8 @@ export interface BookSearchParams {
   fields?: string;
   
   /**
-   * Language preference
+   * Language preference (ISO 639-1 code)
+   * @example 'en', 'fr', 'es'
    */
   lang?: string;
 }

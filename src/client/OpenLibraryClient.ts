@@ -105,7 +105,6 @@ export class OpenLibraryClient {
   async searchBooks(params: BookSearchParams): Promise<ApiResponse<BookSearchResponse>> {
     try {
       const queryParams = new URLSearchParams();
-      queryParams.append('q', params.q);
       
       if (params.title) queryParams.append('title', params.title);
       if (params.author) queryParams.append('author', params.author);
@@ -113,6 +112,30 @@ export class OpenLibraryClient {
       if (params.subject) queryParams.append('subject', params.subject);
       if (params.lang) queryParams.append('lang', params.lang);
       if (params.fields) queryParams.append('fields', params.fields);
+      
+      let queryString = params.q;
+      
+      if (params.first_publish_year) {
+        if (typeof params.first_publish_year === 'number') {
+          queryString += ` first_publish_year:${params.first_publish_year}`;
+        } else {
+          queryString += ` first_publish_year:[${params.first_publish_year.start} TO ${params.first_publish_year.end}]`;
+        }
+      }
+      
+      if (params.publish_year) {
+        if (typeof params.publish_year === 'number') {
+          queryString += ` publish_year:${params.publish_year}`;
+        } else {
+          queryString += ` publish_year:[${params.publish_year.start} TO ${params.publish_year.end}]`;
+        }
+      }
+      
+      queryParams.set('q', queryString);
+      
+      if (params.sort) {
+        queryParams.append('sort', params.sort);
+      }
       
       queryParams.append('limit', String(params.limit || 10));
       queryParams.append('offset', String(params.offset || 0));
@@ -217,10 +240,8 @@ export class OpenLibraryClient {
    */
   async getBookByISBN(isbn: string): Promise<ApiResponse<BookDetails>> {
     try {
-      // Clean the ISBN (remove spaces, hyphens)
       const cleanISBN = isbn.replace(/[-\s]/g, '');
       
-      // Validate ISBN format (basic check)
       if (!/^\d{10}$/.test(cleanISBN) && !/^\d{13}$/.test(cleanISBN)) {
         throw new Error('ISBN must be 10 or 13 digits');
       }

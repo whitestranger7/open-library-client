@@ -4,6 +4,8 @@ export {
   BookSearchParams,
   BookSearchResponse,
   BookSearchResult,
+  YearRange,
+  SortOption,
   WorkDetails,
   EditionDetails,
   BookDetails,

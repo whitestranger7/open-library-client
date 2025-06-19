@@ -1,4 +1,4 @@
-import { OpenLibraryClient, BookSearchParams, ApiResponse, BookSearchResponse, WorkDetails, EditionDetails, BookDetails, ApiError } from '../src';
+import { OpenLibraryClient, BookSearchParams, YearRange, SortOption, ApiResponse, BookSearchResponse, WorkDetails, EditionDetails, BookDetails, ApiError } from '../src';
 
 const comprehensiveExample = async (): Promise<void> => {
   console.log('OpenLibrary Client - Complete Workflow Example');
@@ -134,9 +134,90 @@ const comprehensiveExample = async (): Promise<void> => {
   }
 };
 
+const randomBookExample = async (): Promise<void> => {
+  console.log('Random Book Search Examples');
+  console.log('===========================\n');
+
+  const client = new OpenLibraryClient();
+
+  try {
+    // Random sci-fi book from 1980s
+    console.log('1. Random science fiction book from the 1980s...');
+    const sciFiParams: BookSearchParams = {
+      q: '*',  // Search everything
+      subject: 'science fiction',
+      first_publish_year: { start: 1980, end: 1989 },
+      sort: 'random',
+      limit: 1
+    };
+
+    const sciFiResult = await client.searchBooks(sciFiParams);
+    if (sciFiResult.data.docs.length > 0) {
+      const book = sciFiResult.data.docs[0];
+      if (book) {
+        console.log(`Found: "${book.title}"`);
+        console.log(`Year: ${book.first_publish_year}`);
+        console.log(`Authors: ${book.author_name?.join(', ') || 'Unknown'}`);
+        console.log(`Key: ${book.key}\n`);
+      }
+    }
+
+    // Random French book from any year
+    console.log('2. Random book in French...');
+    const frenchParams: BookSearchParams = {
+      q: '*',
+      lang: 'fr',
+      sort: 'random',
+      limit: 1
+    };
+
+    const frenchResult = await client.searchBooks(frenchParams);
+    if (frenchResult.data.docs.length > 0) {
+      const book = frenchResult.data.docs[0];
+      if (book) {
+        console.log(`Found: "${book.title}"`);
+        console.log(`Year: ${book.first_publish_year || 'Unknown'}`);
+        console.log(`Authors: ${book.author_name?.join(', ') || 'Unknown'}`);
+        console.log(`Key: ${book.key}\n`);
+      }
+    }
+
+    // Random fantasy (2000-2020)
+    console.log('3. Random fantasy book (2000-2020)...');
+    const fantasyParams: BookSearchParams = {
+      q: '*',
+      subject: 'fantasy',
+      first_publish_year: { start: 2000, end: 2020 },
+      lang: 'en',
+      sort: 'random',
+      limit: 3
+    };
+
+    const fantasyResult = await client.searchBooks(fantasyParams);
+    console.log(`Found ${fantasyResult.data.docs.length} random fantasy books:`);
+    fantasyResult.data.docs.forEach((book, index) => {
+      console.log(`${index + 1}. "${book.title}" (${book.first_publish_year})`);
+      console.log(`Authors: ${book.author_name?.join(', ') || 'Unknown'}`);
+      console.log(`Key: ${book.key}`);
+    });
+
+    console.log('\n' + '='.repeat(50));
+    console.log('Random Search Examples Complete!');
+    console.log('='.repeat(50));
+
+  } catch (error) {
+    const apiError = error as ApiError;
+    console.error('Random search error:', apiError.message);
+    if (apiError.status) {
+      console.error(`HTTP Status: ${apiError.status}`);
+    }
+  }
+};
+
 const runExample = async (): Promise<void> => {
   try {
     await comprehensiveExample();
+    await randomBookExample();
   } catch (error) {
     console.error('Unexpected error:', error);
     process.exit(1);
