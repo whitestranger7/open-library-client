@@ -54,20 +54,9 @@ results.data.docs.forEach(book => {
 });
 ```
 
-## Running the Examples
+## Examples
 
-To see the library in action with comprehensive TypeScript examples:
-
-```bash
-# Install dependencies
-npm install
-
-# Run the TypeScript example (recommended)
-npm run example
-
-# Or build first and run the compiled JavaScript
-npm run example:js
-```
+For comprehensive usage examples including complete workflows from search to book details and cover images, see the [`examples/`](./examples/) folder in the repository.
 
 ## API Reference
 

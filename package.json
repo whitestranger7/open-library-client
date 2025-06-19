@@ -10,8 +10,6 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "example": "ts-node examples/basic-usage.ts",
-    "example:js": "npm run build && node examples/basic-usage.js",
     "prepublishOnly": "npm run build",
     "test": "echo \"No tests specified\" && exit 0",
     "lint": "echo \"No linting configured\" && exit 0",

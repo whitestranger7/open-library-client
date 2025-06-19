@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 
 ### Technical
 - Complete JSDoc documentation with examples for all new features
+- Examples folder removed from dist/ and available only in repo
 
 ## [0.0.1] - Initial Release
 
