@@ -1,237 +1,57 @@
 import { OpenLibraryClient, BookSearchParams, ApiResponse, BookSearchResponse, WorkDetails, EditionDetails, BookDetails, ApiError } from '../src';
 
-const basicExample = async (): Promise<void> => {
+const comprehensiveExample = async (): Promise<void> => {
+  console.log('OpenLibrary Client - Complete Workflow Example');
+  console.log('==============================================\n');
+
   const client = new OpenLibraryClient({
     timeout: 15000,
     headers: {
-      'User-Agent': 'TypeScript-Example/1.0.0'
+      'User-Agent': 'OpenLibrary-Example/1.0.0'
     }
   });
 
   try {
+    // Search for books
+    console.log('Searching for "The Hobbit" by J.R.R. Tolkien...');
     const searchParams: BookSearchParams = {
-      q: 'javascript programming',
-      limit: 5
+      q: 'The Hobbit',
+      author: 'J.R.R. Tolkien',
+      limit: 3
     };
 
-    const results: ApiResponse<BookSearchResponse> = await client.searchBooks(searchParams);
+    const searchResults: ApiResponse<BookSearchResponse> = await client.searchBooks(searchParams);
+    console.log(`Found ${searchResults.data.numFound} total results`);
+    console.log(`First of ${searchResults.data.docs.length} books:\n`);
 
-    console.log(`Found ${results.data.numFound} total results`);
-    console.log(`Showing first ${results.data.docs.length} books:\n`);
-
-    results.data.docs.forEach((book, index) => {
+    // Display search results
+    searchResults.data.docs.forEach((book, index) => {
       console.log(`${index + 1}. ${book.title}`);
-      
-      if (book.author_name?.length) {
-        console.log(`Authors: ${book.author_name.join(', ')}`);
-      }
-      
-      if (book.first_publish_year) {
-        console.log(`First published: ${book.first_publish_year}`);
-      }
-      
-      if (book.publisher?.length) {
-        console.log(`Publishers: ${book.publisher.slice(0, 2).join(', ')}`);
-      }
-      
-      console.log(`Editions: ${book.edition_count || 'Unknown'}`);
-      
-      if (book.isbn?.length) {
-        console.log(`ISBN: ${book.isbn[0]}`);
-      }
-      
-      console.log('');
-    });
-
-  } catch (error) {
-    const apiError = error as ApiError;
-    console.error('Error:', apiError.message);
-    if (apiError.status) {
-      console.error(`   Status: ${apiError.status}`);
-    }
-  }
-}
-
-const advancedExample = async (): Promise<void> => {
-  const client = new OpenLibraryClient();
-
-  try {
-    const advancedParams: BookSearchParams = {
-      q: 'artificial intelligence',
-      subject: 'computer science',
-      limit: 3,
-      lang: 'eng',
-      fields: 'key,title,author_name,first_publish_year,subject,cover_i,isbn'
-    };
-
-    const results: ApiResponse<BookSearchResponse> = await client.searchBooks(advancedParams);
-
-    console.log(`Advanced search results for AI books:`);
-    console.log(`Total found: ${results.data.numFound}`);
-    console.log(`Query: "${results.data.q}"`);
-    console.log(`Response status: ${results.status} ${results.statusText}`);
-    console.log('');
-
-    results.data.docs.forEach((book, index) => {
-      console.log(`${index + 1}. ${book.title}`);
-      
-      if (book.author_name?.length) {
-        console.log(`Authors: ${book.author_name.slice(0, 3).join(', ')}`);
-      }
-      
-      if (book.first_publish_year) {
-        console.log(`Year: ${book.first_publish_year}`);
-      }
-      
-      if (book.subject?.length) {
-        console.log(`Subjects: ${book.subject.slice(0, 3).join(', ')}`);
-      }
-      
+      console.log(`Key: ${book.key}`);
+      console.log(`First Published: ${book.first_publish_year || 'Unknown'}`);
+      console.log(`Editions: ${book.edition_count}`);
       if (book.cover_i) {
-        const coverUrl = `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`;
-        console.log(`Cover: ${coverUrl}`);
+        console.log(`   Cover ID: ${book.cover_i}`);
       }
-      
-      if (book.isbn?.length) {
-        console.log(`ISBN: ${book.isbn[0]}`);
-      }
-      
-      console.log(`OpenLibrary Key: ${book.key}`);
       console.log('');
     });
 
-  } catch (error) {
-    const apiError = error as ApiError;
-    console.error('Error:', apiError.message);
-    if (apiError.status) {
-      console.error(`HTTP Status: ${apiError.status}`);
-    }
-  }
-}
-
-const paginationExample = async (): Promise<void> => {
-  console.log('\nPagination Example\n');
-
-  const client = new OpenLibraryClient();
-
-  try {
-    const baseParams: BookSearchParams = {
-      q: 'machine learning',
-      limit: 2,
-      offset: 0
-    };
-
-    console.log('Fetching first page...');
-    let results = await client.searchBooks(baseParams);
-    
-    console.log(`Page 1: Found ${results.data.docs.length} books (of ${results.data.numFound} total)`);
-    results.data.docs.forEach((book, index) => {
-      console.log(`${index + 1}. ${book.title}`);
-    });
-
-    console.log('\Fetching second page...');
-    const nextPageParams: BookSearchParams = {
-      ...baseParams,
-      offset: 2
-    };
-    
-    results = await client.searchBooks(nextPageParams);
-    
-    console.log(`Page 2: Found ${results.data.docs.length} books`);
-    results.data.docs.forEach((book, index) => {
-      console.log(`${index + 1}. ${book.title}`);
-    });
-
-  } catch (error) {
-    const apiError = error as ApiError;
-    console.error('Pagination Error:', apiError.message);
-  }
-}
-
-const authorSearchExample = async (): Promise<void> => {
-  console.log('\nAuthor-Specific Search Example\n');
-
-  const client = new OpenLibraryClient();
-
-  try {
-    const authorParams: BookSearchParams = {
-      q: '*',
-      author: 'Isaac Asimov',
-      limit: 4
-    };
-
-    const results = await client.searchBooks(authorParams);
-
-    console.log(`Books by Isaac Asimov:`);
-    console.log(`Found ${results.data.numFound} total books`);
-    console.log('');
-
-    results.data.docs.forEach((book, index) => {
-      console.log(`${index + 1}. ${book.title}`);
-      
-      if (book.first_publish_year) {
-        console.log(`First published: ${book.first_publish_year}`);
-      }
-      
-      if (book.subject?.length) {
-        console.log(`Subjects: ${book.subject.slice(0, 2).join(', ')}`);
-      }
-      
-      console.log('');
-    });
-
-  } catch (error) {
-    const apiError = error as ApiError;
-    console.error('Author Search Error:', apiError.message);
-  }
-}
-
-const configurationExample = (): void => {
-  console.log('\nConfiguration Example\n');
-
-  const defaultClient = new OpenLibraryClient();
-  console.log(`Default client base URL: ${defaultClient.getBaseURL()}`);
-
-  const customClient = new OpenLibraryClient({
-    baseURL: 'https://openlibrary.org',
-    timeout: 20000,
-    headers: {
-      'User-Agent': 'MyApp/2.0.0',
-      'Accept': 'application/json'
-    }
-  });
-
-  const config = customClient.getConfig();
-  console.log('Custom client configuration:');
-  console.log(`Base URL: ${config.baseURL}`);
-  console.log(`Timeout: ${config.timeout}ms`);
-  console.log(`Custom headers: ${Object.keys(config.headers).length} headers`);
-}
-
-const bookDetailsExample = async (): Promise<void> => {
-  console.log('\nBook Details Examples\n');
-
-  const client = new OpenLibraryClient();
-
-  try {
-    // First, search for a book to get its key
-    console.log('1. Searching for "The Lord of the Rings" to get work key...');
-    const searchResults = await client.searchBooks({
-      q: 'The Lord of the Rings',
-      author: 'Tolkien',
-      limit: 1
-    });
-
+    // Get the ID of the first book
     if (searchResults.data.docs.length > 0) {
-      const book = searchResults.data.docs[0];
-      if (book) {
-        console.log(`Found: ${book.title} (Key: ${book.key})`);
-
-        // Get detailed work information
-        console.log('\n2. Getting detailed work information...');
-        const workDetails = await client.getWork(book.key);
+      const selectedBook = searchResults.data.docs[0];
+      if (!selectedBook) {
+        console.log('No valid book found in search results.');
+        return;
+      }
       
-      console.log(`Work Title: ${workDetails.data.title}`);
+      console.log(`Selected book - "${selectedBook.title}"`);
+      console.log(`Work Key: ${selectedBook.key}\n`);
+
+      // Get detailed information about the specific book
+      console.log('Getting detailed work information...');
+      const workDetails: ApiResponse<WorkDetails> = await client.getWork(selectedBook.key);
+      
+      console.log(`Title: ${workDetails.data.title}`);
       
       if (workDetails.data.description) {
         const description = typeof workDetails.data.description === 'string' 
@@ -240,103 +60,91 @@ const bookDetailsExample = async (): Promise<void> => {
         console.log(`Description: ${description.substring(0, 200)}...`);
       }
       
-      if (workDetails.data.subjects?.length) {
+      if (workDetails.data.subjects && workDetails.data.subjects.length > 0) {
         console.log(`Subjects: ${workDetails.data.subjects.slice(0, 3).join(', ')}`);
       }
       
-      if (workDetails.data.covers?.length) {
-        console.log(`Cover ID: ${workDetails.data.covers[0]}`);
-      }
+      console.log(`First Published: ${workDetails.data.first_publish_date || 'Unknown'}`);
       
-      console.log(`First Published: ${workDetails.data.first_publish_date}`);
-      console.log(`Work Key: ${workDetails.data.key}`);
+      if (workDetails.data.covers && workDetails.data.covers.length > 0) {
+        console.log(`Cover IDs: ${workDetails.data.covers.slice(0, 3).join(', ')}`);
       }
-    }
+      console.log('');
 
-    // Example with specific edition
-    console.log('\n3. Getting specific edition details...');
-    try {
-      const editionDetails = await client.getEdition('OL7353617M');
+      // Get cover URLs
+      console.log('Generating cover image URLs...');
       
-      console.log(`Edition Title: ${editionDetails.data.title}`);
-      if (editionDetails.data.subtitle) {
-        console.log(`Subtitle: ${editionDetails.data.subtitle}`);
+      // Using cover ID from work details
+      if (workDetails.data.covers && workDetails.data.covers.length > 0) {
+        const coverId = workDetails.data.covers[0];
+        if (coverId) {
+          const smallCover = client.getCoverUrl(coverId, 'S');
+          const mediumCover = client.getCoverUrl(coverId, 'M');
+          const largeCover = client.getCoverUrl(coverId, 'L');
+        
+          console.log('Cover URLs by Cover ID:');
+          console.log(`Small:  ${smallCover}`);
+          console.log(`Medium: ${mediumCover}`);
+          console.log(`Large:  ${largeCover}`);
+        }
       }
-      
-      if (editionDetails.data.publishers?.length) {
-        console.log(`Publisher: ${editionDetails.data.publishers[0]}`);
-      }
-      
-      console.log(`Publish Date: ${editionDetails.data.publish_date}`);
-      
-      if (editionDetails.data.number_of_pages) {
-        console.log(`Pages: ${editionDetails.data.number_of_pages}`);
-      }
-      
-      if (editionDetails.data.isbn_13?.length) {
-        console.log(`ISBN-13: ${editionDetails.data.isbn_13[0]}`);
-      }
-      
-      if (editionDetails.data.physical_format) {
-        console.log(`Format: ${editionDetails.data.physical_format}`);
-      }
-      
-      console.log(`Edition Key: ${editionDetails.data.key}`);
-    } catch (error) {
-      console.log('Edition not found or error occurred');
-    }
 
-    // Example with ISBN lookup
-    console.log('\n4. Getting book by ISBN...');
-    try {
-      const bookByISBN = await client.getBookByISBN('9780547928227');
-      
-      console.log(`Book Title: ${bookByISBN.data.title}`);
-      
-      if (bookByISBN.data.publishers?.length) {
-        console.log(`Publisher: ${bookByISBN.data.publishers[0]}`);
+      // Using cover ID from search results
+      if (selectedBook.cover_i) {
+        const searchCoverUrl = client.getCoverUrl(selectedBook.cover_i, 'M');
+        console.log(`Cover from search: ${searchCoverUrl}`);
       }
-      
-      console.log(`Publish Date: ${bookByISBN.data.publish_date}`);
-      
-      if (bookByISBN.data.number_of_pages) {
-        console.log(`Pages: ${bookByISBN.data.number_of_pages}`);
+
+      // Get cover by ISBN if available
+      if (selectedBook.isbn && selectedBook.isbn.length > 0) {
+        const isbn = selectedBook.isbn[0];
+        if (isbn) {
+          const coverByISBN = client.getCoverUrlByISBN(isbn, 'M');
+          console.log(`Cover by ISBN: ${coverByISBN}`);
+        
+          // Get book details by ISBN
+          console.log('\nGetting book details by ISBN...');
+          try {
+            const bookByISBN: ApiResponse<BookDetails> = await client.getBookByISBN(isbn);
+            console.log(`Book Title: ${bookByISBN.data.title}`);
+            console.log(`ISBN-13: ${bookByISBN.data.isbn_13?.[0] || 'Not available'}`);
+            console.log(`Pages: ${bookByISBN.data.number_of_pages || 'Not available'}`);
+            console.log(`Publisher: ${bookByISBN.data.publishers?.[0] || 'Not available'}`);
+            console.log(`Physical Format: ${bookByISBN.data.physical_format || 'Not available'}`);
+          } catch (error) {
+            console.log('ISBN lookup not available for this book');
+          }
+        }
       }
+
+      console.log('\n' + '='.repeat(50));
+      console.log('Workflow Complete!');
+      console.log('='.repeat(50));
       
-      if (bookByISBN.data.isbn_13?.length) {
-        console.log(`ISBN-13: ${bookByISBN.data.isbn_13[0]}`);
-      }
-      
-      console.log(`Book Key: ${bookByISBN.data.key}`);
-    } catch (error) {
-      console.log('Book not found by ISBN or error occurred');
+    } else {
+      console.log('No books found in search results.');
     }
 
   } catch (error) {
     const apiError = error as ApiError;
-    console.error('Book Details Error:', apiError.message);
+    console.error('Error in workflow:', apiError.message);
     if (apiError.status) {
       console.error(`HTTP Status: ${apiError.status}`);
     }
   }
 };
 
-const runExamples = async (): Promise<void> => {
-  console.log('OpenLibrary Client TypeScript Examples\n');
-  console.log('==========================================');
-
-  await basicExample();
-  await advancedExample();
-  await paginationExample();
-  await authorSearchExample();
-  await bookDetailsExample();
-  configurationExample();
-
-  console.log('\nAll examples completed!');
+const runExample = async (): Promise<void> => {
+  try {
+    await comprehensiveExample();
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    process.exit(1);
+  }
 };
 
 if (require.main === module) {
-  runExamples().catch(console.error);
+  runExample();
 }
 
-export { runExamples }; 
+export { runExample }; 
