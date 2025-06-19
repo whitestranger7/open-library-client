@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2024-12-30
+
+### Added
+
+**Random Book Search & Advanced Filtering**
+- `sort` parameter in `BookSearchParams` - Sort results by 'random', 'new', 'old', 'rating', 'title', or 'relevance'
+- `first_publish_year` parameter - Filter by first publication year or year range
+- `publish_year` parameter - Filter by any publication year or year range
+- `YearRange` interface - Define year ranges with start and end properties
+- `SortOption` type - Type-safe sorting options
+
+**Enhanced Language Support**
+- Improved `lang` parameter documentation with examples for language filtering
+
+**Random Book Examples**
+- Complete examples showing random book selection by genre, year range, and language
+- Demonstrates real-world usage for external applications needing random book discovery
+
+### Improved
+- Enhanced TypeScript type coverage for search parameters
+- Better documentation for year filtering and sorting options
+- Updated examples with comprehensive random book search workflows
+
+### Technical
+- Year range filtering implemented using OpenLibrary's query syntax (e.g., `first_publish_year:[1980 TO 1989]`)
+- Random sorting leverages OpenLibrary's native `sort=random` parameter
+- Maintained full backward compatibility with existing search functionality
+
 ## [0.1.0] - 2024-12-30
 
 ### Added

@@ -92,16 +92,26 @@ Search for books using the OpenLibrary search API.
 **Parameters:**
 ```typescript
 interface BookSearchParams {
-  q: string;              // Main search query (required)
-  title?: string;         // Search by title
-  author?: string;        // Search by author
-  isbn?: string;          // Search by ISBN
-  subject?: string;       // Search by subject
-  limit?: number;         // Number of results (default: 10, max: 100)
-  offset?: number;        // Pagination offset (default: 0)
-  fields?: string;        // Specific fields to include
-  lang?: string;          // Language preference
+  q: string;                               // Main search query (required)
+  title?: string;                          // Search by title
+  author?: string;                         // Search by author
+  isbn?: string;                           // Search by ISBN
+  subject?: string;                        // Search by subject
+  limit?: number;                          // Number of results (default: 10, max: 100)
+  offset?: number;                         // Pagination offset (default: 0)
+  fields?: string;                         // Specific fields to include
+  lang?: string;                           // Language preference (e.g., 'en', 'fr', 'es')
+  first_publish_year?: number | YearRange; // Filter by first publication year or range
+  publish_year?: number | YearRange;       // Filter by any publication year or range
+  sort?: SortOption;                       // Sort results by various criteria
 }
+
+interface YearRange {
+  start: number;    // Start year (inclusive)
+  end: number;      // End year (inclusive)
+}
+
+type SortOption = 'random' | 'new' | 'old' | 'rating' | 'title' | 'relevance';
 ```
 
 **Returns:**
@@ -191,6 +201,34 @@ const authorParams: BookSearchParams = {
   title: 'JavaScript'
 };
 const results = await client.searchBooks(authorParams);
+
+// Random book search with advanced filtering
+const randomSciFiParams: BookSearchParams = {
+  q: '*',
+  subject: 'science fiction',
+  first_publish_year: { start: 1980, end: 1989 }, // Books from the 1980s
+  sort: 'random',
+  limit: 5
+};
+const randomBooks = await client.searchBooks(randomSciFiParams);
+
+// Random book in specific language
+const randomFrenchParams: BookSearchParams = {
+  q: '*',
+  lang: 'fr',
+  sort: 'random',
+  limit: 3
+};
+const frenchBooks = await client.searchBooks(randomFrenchParams);
+
+// Sort by different criteria
+const recentBooksParams: BookSearchParams = {
+  q: 'programming',
+  subject: 'computers',
+  sort: 'new',
+  limit: 10
+};
+const recentBooks = await client.searchBooks(recentBooksParams);
 
 // Get detailed work information
 const workDetails = await client.getWork("OL45804W");
@@ -332,6 +370,62 @@ try {
 }
 ```
 
+## Random Book Discovery
+
+The client supports advanced filtering and random sorting for discovering books by various criteria:
+
+### Random Books by Genre and Year
+
+```typescript
+// Get random science fiction books from the 1980s
+const randomSciFi: BookSearchParams = {
+  q: '*',
+  subject: 'science fiction',
+  first_publish_year: { start: 1980, end: 1989 },
+  sort: 'random',
+  limit: 5
+};
+const sciFiBooks = await client.searchBooks(randomSciFi);
+```
+
+### Random Books by Language
+
+```typescript
+// Get random books in French
+const randomFrench: BookSearchParams = {
+  q: '*',
+  lang: 'fr',
+  sort: 'random',
+  limit: 5
+};
+const frenchBooks = await client.searchBooks(randomFrench);
+```
+
+### Sorting Options
+
+```typescript
+// Sort by newest first
+const newestBooks: BookSearchParams = {
+  q: 'artificial intelligence',
+  sort: 'new',
+  limit: 10
+};
+
+// Sort by highest rated
+const topRated: BookSearchParams = {
+  q: 'machine learning',
+  sort: 'rating',
+  limit: 10
+};
+
+// Sort alphabetically by title
+const alphabetical: BookSearchParams = {
+  q: 'data science',
+  sort: 'title',
+  limit: 10
+};
+```
+
 ## Advanced Usage
 
 ### Custom Configuration
@@ -408,12 +502,17 @@ console.log(`Page 2: ${results.data.docs.length} results`);
 
 ## Development Roadmap
 
-This is the initial version focusing on book search functionality. Future versions will include:
-
-- **Work Details**: Get detailed information about specific works
-- **Author Information**: Retrieve author details and bibliographies  
+✅ **Completed Features**:
+- **Book Search**: Complete search functionality with advanced filtering
+- **Work Details**: Get detailed information about specific works  
 - **Edition Data**: Access specific edition information
-- **Subject Browsing**: Browse books by subject categories
+- **Random Discovery**: Random book selection with genre, year, and language filtering
+- **Cover Images**: Generate cover image URLs from cover IDs and ISBNs
+- **ISBN Lookup**: Direct book lookup by ISBN-10 or ISBN-13
+
+🚧 **Future Enhancements**:
+- **Author Information**: Retrieve author details and bibliographies
+- **Subject Browsing**: Browse books by subject categories  
 - **Reading Lists**: Integration with OpenLibrary reading lists
 - **Rate Limiting**: Built-in rate limiting for API compliance
 - **Caching**: Optional response caching for better performance
