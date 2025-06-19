@@ -1,6 +1,6 @@
 {
   "name": "open-library-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A modern TypeScript API wrapper for the OpenLibrary REST API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "axios": "1.10.0"
   },
   "devDependencies": {
-    "@types/node": "24.0.1",
+    "@types/node": "24.0.3",
     "typescript": "5.8.3",
     "ts-node": "10.9.2"
   },

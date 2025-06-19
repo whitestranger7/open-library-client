@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2024-12-30
+
+### Technical
+- Dependencies version bump
+
+### Improved
+- README.md file is updated
+
 ## [0.1.1] - 2024-12-30
 
 ### Added
