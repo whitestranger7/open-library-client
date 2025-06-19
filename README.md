@@ -120,6 +120,62 @@ interface BookSearchParams {
 Promise<ApiResponse<BookSearchResponse>>
 ```
 
+##### getWork(workKey: string)
+
+Get detailed information about a specific work.
+
+**Parameters:**
+- `workKey`: The OpenLibrary work key (e.g., "OL45804W")
+
+**Returns:**
+```typescript
+Promise<ApiResponse<WorkDetails>>
+```
+
+##### getEdition(editionKey: string)
+
+Get detailed information about a specific edition.
+
+**Parameters:**
+- `editionKey`: The OpenLibrary edition key (e.g., "OL7353617M")
+
+**Returns:**
+```typescript
+Promise<ApiResponse<EditionDetails>>
+```
+
+##### getBookByISBN(isbn: string)
+
+Get book information by ISBN.
+
+**Parameters:**
+- `isbn`: The ISBN (10 or 13 digits)
+
+**Returns:**
+```typescript
+Promise<ApiResponse<BookDetails>>
+```
+
+##### getCoverUrl(coverId: number, size?: 'S' | 'M' | 'L')
+
+Generate cover image URL from cover ID.
+
+**Parameters:**
+- `coverId`: The cover ID number
+- `size`: Size of the cover image (default: 'M')
+
+**Returns:** Cover image URL string
+
+##### getCoverUrlByISBN(isbn: string, size?: 'S' | 'M' | 'L')
+
+Generate cover image URL from ISBN.
+
+**Parameters:**
+- `isbn`: The ISBN (10 or 13 digits)  
+- `size`: Size of the cover image (default: 'M')
+
+**Returns:** Cover image URL string
+
 **Example:**
 ```typescript
 // Basic search with type safety
@@ -146,6 +202,25 @@ const authorParams: BookSearchParams = {
   title: 'JavaScript'
 };
 const results = await client.searchBooks(authorParams);
+
+// Get detailed work information
+const workDetails = await client.getWork("OL45804W");
+console.log(workDetails.data.title);
+console.log(workDetails.data.description);
+
+// Get specific edition details
+const editionDetails = await client.getEdition("OL7353617M");
+console.log(editionDetails.data.title);
+console.log(editionDetails.data.number_of_pages);
+
+// Get book by ISBN
+const bookDetails = await client.getBookByISBN("9780547928227");
+console.log(bookDetails.data.title);
+console.log(bookDetails.data.publishers);
+
+// Generate cover URLs
+const coverUrl = client.getCoverUrl(8739161, 'M');
+const coverUrlByISBN = client.getCoverUrlByISBN('9780547928227', 'L');
 ```
 
 ### Response Types
@@ -183,6 +258,68 @@ interface BookSearchResult {
   edition_count: number;          // Number of editions
   has_fulltext: boolean;          // Full text available
   // ... and many more fields
+}
+```
+
+#### WorkDetails
+
+Detailed work information:
+
+```typescript
+interface WorkDetails {
+  key: string;                    // Work key
+  title: string;                  // Work title
+  description?: string | object;  // Work description
+  authors?: Array<object>;        // Author information
+  subjects?: string[];            // Subject classifications
+  covers?: number[];              // Cover image IDs
+  first_publish_date?: string;    // First publication date
+  links?: Array<object>;          // External links
+  // ... and more metadata
+}
+```
+
+#### EditionDetails
+
+Detailed edition information:
+
+```typescript
+interface EditionDetails {
+  key: string;                    // Edition key
+  title: string;                  // Edition title
+  subtitle?: string;              // Subtitle
+  authors?: Array<object>;        // Author references
+  works?: Array<object>;          // Work references
+  isbn_10?: string[];             // ISBN-10 numbers
+  isbn_13?: string[];             // ISBN-13 numbers
+  publishers?: string[];          // Publishers
+  publish_date?: string;          // Publication date
+  number_of_pages?: number;       // Page count
+  physical_format?: string;       // Format (hardcover, paperback, etc.)
+  covers?: number[];              // Cover image IDs
+  // ... and more edition-specific data
+}
+```
+
+#### BookDetails
+
+Book information (from ISBN lookup):
+
+```typescript
+interface BookDetails {
+  key: string;                    // Book key
+  title: string;                  // Book title
+  subtitle?: string;              // Subtitle
+  description?: string | object;  // Description
+  authors?: Array<object>;        // Author information
+  publishers?: string[];          // Publishers
+  publish_date?: string;          // Publication date
+  isbn_10?: string[];             // ISBN-10 numbers
+  isbn_13?: string[];             // ISBN-13 numbers
+  number_of_pages?: number;       // Page count
+  covers?: number[];              // Cover image IDs
+  subjects?: string[];            // Subjects
+  // ... and more book data
 }
 ```
 

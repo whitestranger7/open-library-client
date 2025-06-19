@@ -1,4 +1,4 @@
-import { OpenLibraryClient, BookSearchParams, ApiResponse, BookSearchResponse, ApiError } from '../src';
+import { OpenLibraryClient, BookSearchParams, ApiResponse, BookSearchResponse, WorkDetails, EditionDetails, BookDetails, ApiError } from '../src';
 
 const basicExample = async (): Promise<void> => {
   const client = new OpenLibraryClient({
@@ -45,7 +45,7 @@ const basicExample = async (): Promise<void> => {
 
   } catch (error) {
     const apiError = error as ApiError;
-    console.error('❌ Error:', apiError.message);
+    console.error('Error:', apiError.message);
     if (apiError.status) {
       console.error(`   Status: ${apiError.status}`);
     }
@@ -208,20 +208,132 @@ const configurationExample = (): void => {
   console.log(`Custom headers: ${Object.keys(config.headers).length} headers`);
 }
 
-const runExamples = async (): Promise<void> => {
+const bookDetailsExample = async (): Promise<void> => {
+  console.log('\nBook Details Examples\n');
+
+  const client = new OpenLibraryClient();
+
   try {
-    await basicExample();
-    await advancedExample();
-    await paginationExample();
-    await authorSearchExample();
-    configurationExample();
-    
-    console.log('For more information, check the README.md file');
+    // First, search for a book to get its key
+    console.log('1. Searching for "The Lord of the Rings" to get work key...');
+    const searchResults = await client.searchBooks({
+      q: 'The Lord of the Rings',
+      author: 'Tolkien',
+      limit: 1
+    });
+
+    if (searchResults.data.docs.length > 0) {
+      const book = searchResults.data.docs[0];
+      if (book) {
+        console.log(`Found: ${book.title} (Key: ${book.key})`);
+
+        // Get detailed work information
+        console.log('\n2. Getting detailed work information...');
+        const workDetails = await client.getWork(book.key);
+      
+      console.log(`Work Title: ${workDetails.data.title}`);
+      
+      if (workDetails.data.description) {
+        const description = typeof workDetails.data.description === 'string' 
+          ? workDetails.data.description 
+          : workDetails.data.description.value;
+        console.log(`Description: ${description.substring(0, 200)}...`);
+      }
+      
+      if (workDetails.data.subjects?.length) {
+        console.log(`Subjects: ${workDetails.data.subjects.slice(0, 3).join(', ')}`);
+      }
+      
+      if (workDetails.data.covers?.length) {
+        console.log(`Cover ID: ${workDetails.data.covers[0]}`);
+      }
+      
+      console.log(`First Published: ${workDetails.data.first_publish_date}`);
+      console.log(`Work Key: ${workDetails.data.key}`);
+      }
+    }
+
+    // Example with specific edition
+    console.log('\n3. Getting specific edition details...');
+    try {
+      const editionDetails = await client.getEdition('OL7353617M');
+      
+      console.log(`Edition Title: ${editionDetails.data.title}`);
+      if (editionDetails.data.subtitle) {
+        console.log(`Subtitle: ${editionDetails.data.subtitle}`);
+      }
+      
+      if (editionDetails.data.publishers?.length) {
+        console.log(`Publisher: ${editionDetails.data.publishers[0]}`);
+      }
+      
+      console.log(`Publish Date: ${editionDetails.data.publish_date}`);
+      
+      if (editionDetails.data.number_of_pages) {
+        console.log(`Pages: ${editionDetails.data.number_of_pages}`);
+      }
+      
+      if (editionDetails.data.isbn_13?.length) {
+        console.log(`ISBN-13: ${editionDetails.data.isbn_13[0]}`);
+      }
+      
+      if (editionDetails.data.physical_format) {
+        console.log(`Format: ${editionDetails.data.physical_format}`);
+      }
+      
+      console.log(`Edition Key: ${editionDetails.data.key}`);
+    } catch (error) {
+      console.log('Edition not found or error occurred');
+    }
+
+    // Example with ISBN lookup
+    console.log('\n4. Getting book by ISBN...');
+    try {
+      const bookByISBN = await client.getBookByISBN('9780547928227');
+      
+      console.log(`Book Title: ${bookByISBN.data.title}`);
+      
+      if (bookByISBN.data.publishers?.length) {
+        console.log(`Publisher: ${bookByISBN.data.publishers[0]}`);
+      }
+      
+      console.log(`Publish Date: ${bookByISBN.data.publish_date}`);
+      
+      if (bookByISBN.data.number_of_pages) {
+        console.log(`Pages: ${bookByISBN.data.number_of_pages}`);
+      }
+      
+      if (bookByISBN.data.isbn_13?.length) {
+        console.log(`ISBN-13: ${bookByISBN.data.isbn_13[0]}`);
+      }
+      
+      console.log(`Book Key: ${bookByISBN.data.key}`);
+    } catch (error) {
+      console.log('Book not found by ISBN or error occurred');
+    }
+
   } catch (error) {
-    console.error('Unexpected error in examples:', error);
-    process.exit(1);
+    const apiError = error as ApiError;
+    console.error('Book Details Error:', apiError.message);
+    if (apiError.status) {
+      console.error(`HTTP Status: ${apiError.status}`);
+    }
   }
-}
+};
+
+const runExamples = async (): Promise<void> => {
+  console.log('OpenLibrary Client TypeScript Examples\n');
+  console.log('==========================================');
+
+  await basicExample();
+  await advancedExample();
+  await paginationExample();
+  await authorSearchExample();
+  await bookDetailsExample();
+  configurationExample();
+
+  console.log('\nAll examples completed!');
+};
 
 if (require.main === module) {
   runExamples().catch(console.error);

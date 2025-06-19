@@ -175,6 +175,158 @@ export interface ApiError {
 }
 
 /**
+ * Detailed work information from OpenLibrary
+ */
+export interface WorkDetails {
+  key: string;
+  type: {
+    key: string;
+  };
+  title: string;
+  description?: string | {
+    type: string;
+    value: string;
+  };
+  authors?: Array<{
+    type: {
+      key: string;
+    };
+    author: {
+      key: string;
+    };
+  }>;
+  subjects?: string[];
+  subject_places?: string[];
+  subject_times?: string[];
+  subject_people?: string[];
+  covers?: number[];
+  first_publish_date?: string;
+  links?: Array<{
+    url: string;
+    title: string;
+    type?: {
+      key: string;
+    };
+  }>;
+  excerpts?: Array<{
+    excerpt: string;
+    comment?: string;
+  }>;
+  created: {
+    type: string;
+    value: string;
+  };
+  last_modified: {
+    type: string;
+    value: string;
+  };
+  latest_revision: number;
+  revision: number;
+}
+
+/**
+ * Detailed edition information from OpenLibrary
+ */
+export interface EditionDetails {
+  key: string;
+  type: {
+    key: string;
+  };
+  title: string;
+  subtitle?: string;
+  authors?: Array<{
+    key: string;
+  }>;
+  works?: Array<{
+    key: string;
+  }>;
+  isbn_10?: string[];
+  isbn_13?: string[];
+  publishers?: string[];
+  publish_date?: string;
+  publish_places?: string[];
+  publish_country?: string;
+  number_of_pages?: number;
+  pagination?: string;
+  physical_format?: string;
+  languages?: Array<{
+    key: string;
+  }>;
+  subjects?: string[];
+  covers?: number[];
+  series?: string[];
+  genres?: string[];
+  description?: string | {
+    type: string;
+    value: string;
+  };
+  notes?: string | {
+    type: string;
+    value: string;
+  };
+  table_of_contents?: Array<{
+    title: string;
+    level?: number;
+    pagenum?: string;
+  }>;
+  dewey_decimal_class?: string[];
+  lc_classifications?: string[];
+  lccn?: string[];
+  oclc_numbers?: string[];
+  goodreads?: string[];
+  librarything?: string[];
+  created: {
+    type: string;
+    value: string;
+  };
+  last_modified: {
+    type: string;
+    value: string;
+  };
+  latest_revision: number;
+  revision: number;
+}
+
+/**
+ * Book details response (can be either work or edition)
+ */
+export interface BookDetails {
+  key: string;
+  type: {
+    key: string;
+  };
+  title: string;
+  subtitle?: string;
+  description?: string | {
+    type: string;
+    value: string;
+  };
+  authors?: Array<{
+    key: string;
+    name?: string;
+  }>;
+  publishers?: string[];
+  publish_date?: string;
+  isbn_10?: string[];
+  isbn_13?: string[];
+  number_of_pages?: number;
+  covers?: number[];
+  subjects?: string[];
+  physical_format?: string;
+  works?: Array<{
+    key: string;
+  }>;
+  created: {
+    type: string;
+    value: string;
+  };
+  last_modified: {
+    type: string;
+    value: string;
+  };
+}
+
+/**
  * Generic API response wrapper
  */
 export interface ApiResponse<T> {
