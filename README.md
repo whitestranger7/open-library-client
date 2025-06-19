@@ -530,7 +530,7 @@ MIT License - see LICENSE file for details.
 
 - [OpenLibrary API Documentation](https://openlibrary.org/developers/api)
 - [OpenLibrary Website](https://openlibrary.org/)
-- [Issue Tracker](https://github.com/username/open-library-client/issues)
+- [Issue Tracker](https://github.com/whitestranger7/open-library-client/issues)
 
 ---
 
